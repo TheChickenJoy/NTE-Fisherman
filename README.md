@@ -1,6 +1,8 @@
 <p align="center">
   <img width="563" height="628" alt="FishingBotPNG" src="https://github.com/user-attachments/assets/fff8ef90-6910-4714-9beb-4147d0e55e89" />
 </p>
+
+
 # NTE-Fisherman
 A fishing bot using OpenCVSharp and SharpDX, originally a Tower of Fantasy bot made by mdnpascual and repurposed for Nevernes to Everness.
 
