@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window x:Class="NTE_Fishing_Bot.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:local="clr-namespace:NTE_Fishing_Bot" x:Name="MainWindows" Title="NTE Fisherman" Height="840" Width="760">
+  <FrameworkElement.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Resources/StylingDictionary.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
+  </FrameworkElement.Resources>
+
+  <Grid Name="Main_Window">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Collapsible Side Menu -->
+    <Border Name="SideMenuBorder" Grid.Column="0" Grid.RowSpan="3" Width="155"
+            BorderThickness="0,0,1,0" Margin="5,5,0,5">
+      <DockPanel>
+
+        <!-- Ko-fi support button pinned to bottom -->
+        <Button Name="KofiBtn" DockPanel.Dock="Bottom" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,6" Click="KofiBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <TextBlock Text="&#x2665;" FontSize="15" Width="20" TextAlignment="Center"
+                       Foreground="#FF5E5B" VerticalAlignment="Center" />
+            <TextBlock Name="SideKofiLabel" Text="Support Ko-fi" Margin="9,0,0,0"
+                       VerticalAlignment="Center" FontSize="12" Foreground="#FF5E5B" />
+          </StackPanel>
+        </Button>
+
+        <StackPanel>
+
+        <!-- Hamburger toggle button -->
+        <Button Name="HamburgerBtn" Height="34" HorizontalAlignment="Stretch"
+                Style="{StaticResource btnRoundDark}" Margin="3,3,3,3" Click="HamburgerBtn_Click">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="&#x2630;" FontSize="18" VerticalAlignment="Center" />
+            <TextBlock Name="CloseMenuLabel" Text="Close Menu" Margin="9,0,0,0"
+                       VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        <Separator Name="SideMenuSeparator" Margin="6,4,6,4" />
+
+        <!-- Settings -->
+        <Button Name="SettingBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="SettingBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <Image Name="SettingImg" Width="20" Height="20" Source="/img/setting_night.png" VerticalAlignment="Center" />
+            <TextBlock Name="SideSettingLabel" Text="Settings" Margin="9,0,0,0" VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        <!-- Dark Mode -->
+        <Button Name="ThemeModeBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="ThemeModeBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <Image Name="ThemeModeImg" Width="20" Height="20" Source="/img/night.png" VerticalAlignment="Center" />
+            <TextBlock Name="SideThemeLabel" Text="Dark Mode" Margin="9,0,0,0" VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        <!-- Stay on Top -->
+        <Button Name="AlwaysOnTopBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="AlwaysOnTopBtn_Click" ToolTip="Always On Top">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <TextBlock Name="AlwaysOnTopIcon" Text="&#x1F4CC;" FontSize="15" Width="20"
+                       TextAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Name="SideAlwaysOnTopLabel" Text="Stay on Top" Margin="9,0,0,0" VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        <!-- Background Inputs -->
+        <Button Name="BackgroundInputBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="BackgroundInputBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <TextBlock Text="&#x2328;" FontSize="15" Width="20" TextAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Name="BackgroundInputLabel" Text="Background Inputs: Off" Margin="9,0,0,0"
+                       VerticalAlignment="Center" FontSize="10" TextWrapping="Wrap" MaxWidth="98" />
+          </StackPanel>
+        </Button>
+
+        <!-- FAQ -->
+        <Button Name="FaqBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="FaqBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <TextBlock Text="?" FontSize="18" FontWeight="Bold" Width="20"
+                       TextAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Name="SideFaqLabel" Text="FAQ" Margin="9,0,0,0"
+                       VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        <!-- Debug Log -->
+        <Button Name="LogBtn" Height="42" HorizontalAlignment="Stretch"
+                Margin="3,2,3,2" Click="LogBtn_Click">
+          <StackPanel Orientation="Horizontal" Margin="8,0,4,0">
+            <TextBlock Text="&#x1F4CB;" FontSize="14" Width="20"
+                       TextAlignment="Center" VerticalAlignment="Center" />
+            <TextBlock Name="SideLogLabel" Text="Debug Log" Margin="9,0,0,0"
+                       VerticalAlignment="Center" FontSize="12" />
+          </StackPanel>
+        </Button>
+
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- ROW 0: Setup GroupBoxes -->
+    <Grid Grid.Row="0" Grid.Column="1" Margin="5,5,5,5">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="3*" />
+        <ColumnDefinition Width="2*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Left column: Middle Bar Setup + Detection Setup stacked -->
+      <StackPanel Grid.Column="0" Margin="0,0,4,0">
+
+        <!-- Middle Bar Setup -->
+        <GroupBox Name="MiddleBarGBox" Header="Middle Bar Setup" BorderThickness="4" Panel.ZIndex="1">
+          <Grid Margin="6">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Name="UpperLeftBtn" Grid.Row="0" Grid.Column="0" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="UpperLeftBtn_Click">
+              <TextBlock Name="UpperLeftLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">
+                <Run Text="Upper" /><LineBreak /><Run Text="Left" />
+              </TextBlock>
+            </Button>
+            <Button Name="MiddleBarColorBtn" Grid.Row="0" Grid.Column="1" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="MiddleBarColorBtn_Click">
+              <TextBlock Name="MiddleBarColorLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Middle Bar</TextBlock>
+            </Button>
+            <Button Name="LowerRightBtn" Grid.Row="0" Grid.Column="2" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="LowerRightBtn_Click">
+              <TextBlock Name="LowerRightLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">
+                <Run Text="Lower" /><LineBreak /><Run Text="Right" />
+              </TextBlock>
+            </Button>
+
+            <TextBlock Name="UpperLeftCoords" Grid.Row="1" Grid.Column="0" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+              <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+            </TextBlock>
+            <TextBlock Name="LowerRightCoords" Grid.Row="1" Grid.Column="2" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+              <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+            </TextBlock>
+
+            <Button Name="CursorColorBtn" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Height="42" HorizontalAlignment="Center" Width="105" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3,6,3,3" Click="CursorColorBtn_Click">
+              <TextBlock Name="CursorColorLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Cursor</TextBlock>
+            </Button>
+          </Grid>
+        </GroupBox>
+
+        <!-- Detection Setup -->
+        <GroupBox Name="DetectionGBox" Header="Detection Setup" BorderThickness="4" Margin="0,5,0,0">
+          <Grid Margin="6">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Button Name="CastBtnBtn" Grid.Row="0" Grid.Column="0" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="CastBtnBtn_Click">
+              <TextBlock Name="CastBtnLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Cast Button<LineBreak />Detection</TextBlock>
+            </Button>
+            <Button Name="XpBarColorBtn" Grid.Row="0" Grid.Column="1" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="XpBarColorBtn_Click">
+              <TextBlock Name="XpBarColorLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">XP Bar<LineBreak />Detect</TextBlock>
+            </Button>
+
+            <TextBlock Name="CastBtnCoords" Grid.Row="1" Grid.Column="0" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+              <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+            </TextBlock>
+            <TextBlock Name="XpBarCoords" Grid.Row="1" Grid.Column="1" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+              <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+            </TextBlock>
+
+            <Rectangle Name="CastBtnIndicator" Grid.Row="2" Grid.Column="0" Height="8" RadiusX="4" RadiusY="4" HorizontalAlignment="Center" Width="50" Margin="3,5,3,2" Fill="#FF444444" />
+            <Rectangle Name="XpBarIndicator" Grid.Row="2" Grid.Column="1" Height="8" RadiusX="4" RadiusY="4" HorizontalAlignment="Center" Width="50" Margin="3,5,3,2" Fill="#FF444444" />
+
+            <!-- Daily Reward popup detector -->
+            <Button Name="DailyRewardBtn" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3,8,3,3" Click="DailyRewardBtn_Click">
+              <TextBlock Name="DailyRewardLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Daily Reward<LineBreak />Popup Detect</TextBlock>
+            </Button>
+            <TextBlock Name="DailyRewardCoords" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+              <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+            </TextBlock>
+            <Rectangle Name="DailyRewardIndicator" Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Height="8" RadiusX="4" RadiusY="4" HorizontalAlignment="Center" Width="50" Margin="3,5,3,2" Fill="#FF444444" />
+            <TextBlock Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" TextAlignment="Center" FontSize="9" Foreground="#FF888888" Margin="3,2,3,0" TextWrapping="Wrap">⚠ Daily Reward Detect is only auto-configured by Auto-Scale. If you don't use it, click the button above to set it up manually.</TextBlock>
+          </Grid>
+        </GroupBox>
+
+      </StackPanel>
+
+      <!-- Right column: Stamina Setup -->
+      <GroupBox Name="StaminaGBox" Header="Stamina Setup" Grid.Column="1" Margin="4,0,0,0" BorderThickness="4">
+        <Grid Margin="6">
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+
+          <Button Name="FishStaminaColorBtn" Grid.Row="0" Grid.Column="0" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="FishStaminaColorBtn_Click">
+            <TextBlock Name="FishStaminaColorLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Fish</TextBlock>
+          </Button>
+          <Button Name="PlayerStaminaColorBtn" Grid.Row="0" Grid.Column="1" Height="50" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="3" Click="PlayerStaminaColorBtn_Click">
+            <TextBlock Name="PlayerStaminaColorLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="13">Player</TextBlock>
+          </Button>
+
+          <TextBlock Name="FishStaminaCoords" Grid.Row="1" Grid.Column="0" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+            <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+          </TextBlock>
+          <TextBlock Name="PlayerStaminaCoords" Grid.Row="1" Grid.Column="1" TextAlignment="Center" FontSize="11" Margin="3,2" Foreground="#FF888888">
+            <Run Text="X: ?" /><LineBreak /><Run Text="Y: ?" />
+          </TextBlock>
+
+          <Rectangle Name="FishStaminaIndicator" Grid.Row="2" Grid.Column="0" Height="8" RadiusX="4" RadiusY="4" HorizontalAlignment="Center" Width="50" Margin="3,5,3,2" Fill="#FF444444" />
+          <Rectangle Name="PlayerStaminaIndicator" Grid.Row="2" Grid.Column="1" Height="8" RadiusX="4" RadiusY="4" HorizontalAlignment="Center" Width="50" Margin="3,5,3,2" Fill="#FF444444" />
+
+          <Image Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Source="/img/chibi.png" HorizontalAlignment="Center" VerticalAlignment="Center" Stretch="Uniform" Height="210" Margin="4,6,4,2" />
+          <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" TextWrapping="Wrap" TextAlignment="Center"
+                     FontSize="10" FontStyle="Italic" Margin="4,2,4,4" Name="ChibiHintLabel">
+            Daffodil recommends checking the FAQ and Video Setup Guide if you need help getting started!
+          </TextBlock>
+        </Grid>
+      </GroupBox>
+    </Grid>
+
+    <!-- ROW 1: Output (controls integrated) -->
+    <Grid Grid.Row="1" Grid.Column="1" Margin="5,0,5,5">
+
+      <GroupBox Name="OutputGBox" Header="  Output" BorderThickness="4,4,4,4" FontSize="14">
+        <StackPanel VerticalAlignment="Center">
+
+          <!-- Bar + cursor mask images -->
+          <StackPanel Margin="6,6,6,4">
+            <Image Name="middleBarImage" Height="20" HorizontalAlignment="Stretch" />
+            <Image Name="cursorImage" Height="20" HorizontalAlignment="Stretch" Margin="0,4,0,0" />
+          </StackPanel>
+
+          <!-- Admin warning banner -->
+          <Border Name="AdminWarningBanner" Background="#FFFFC107" CornerRadius="4"
+                  Padding="6,5" Margin="6,0,6,6" Visibility="Collapsed">
+            <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="10"
+                       Foreground="#FF000000">⚠ Not running as Administrator. Some inputs may not work. Please restart as Admin.</TextBlock>
+          </Border>
+
+          <!-- Key outputs + circle inline -->
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0">
+            <Grid Width="78" Height="78" VerticalAlignment="Center">
+              <Rectangle Name="LeftBox" Stroke="#FF000000" RadiusX="20" RadiusY="20" Fill="#00000000" />
+              <TextBlock Name="MoveLeftLabel" HorizontalAlignment="Center" TextWrapping="Wrap" Text="A" VerticalAlignment="Center" FontSize="34" />
+            </Grid>
+            <Grid Width="78" Height="78" Margin="10,0,0,0" VerticalAlignment="Center">
+              <Rectangle Name="RightBox" Stroke="#FF000000" RadiusX="20" RadiusY="20" Fill="#00000000" />
+              <TextBlock Name="MoveRightLabel" HorizontalAlignment="Center" TextWrapping="Wrap" Text="D" VerticalAlignment="Center" FontSize="34" />
+            </Grid>
+            <Grid Width="88" Height="78" Margin="10,0,0,0" VerticalAlignment="Center">
+              <Rectangle Name="EscBox" Stroke="#FF000000" RadiusX="20" RadiusY="20" Fill="#00000000" />
+              <TextBlock Name="EscBoxLabel" HorizontalAlignment="Center" TextWrapping="Wrap" Text="ESC" VerticalAlignment="Center" FontSize="22" />
+            </Grid>
+            <Grid Width="62" Height="78" Margin="10,0,0,0" VerticalAlignment="Center">
+              <Rectangle Name="FBox" Stroke="#FF000000" RadiusX="20" RadiusY="20" Fill="#00000000" />
+              <TextBlock Name="FBoxLabel" HorizontalAlignment="Center" TextWrapping="Wrap" Text="F" VerticalAlignment="Center" FontSize="34" />
+            </Grid>
+            <!-- Circular cast detection inline after F -->
+            <StackPanel Margin="14,0,0,0" VerticalAlignment="Center">
+              <Grid Width="78" Height="78">
+                <Ellipse Name="CastReadyRing" Stroke="#FF444444" StrokeThickness="2" />
+                <Image Name="castReadyImage" Width="74" Height="74" Stretch="Uniform"
+                       HorizontalAlignment="Center" VerticalAlignment="Center">
+                  <Image.Clip>
+                    <EllipseGeometry Center="37,37" RadiusX="37" RadiusY="37" />
+                  </Image.Clip>
+                </Image>
+              </Grid>
+            </StackPanel>
+          </StackPanel>
+
+          <Border BorderThickness="0,2,0,0" Margin="6,8,6,0"
+                  BorderBrush="{Binding BorderBrush, ElementName=OutputGBox}" />
+
+          <!-- Bottom: Status/Caught left, Controls right -->
+          <Grid Margin="8,20,8,6">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*" />
+              <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: Status + Fish count + debug values + version -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Top">
+              <Label Name="StatusLabel" Content="Status:" FontSize="20" HorizontalAlignment="Left" Padding="0" Margin="0,0,0,4" />
+              <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBlock Name="FishCaughtLabel" Text="🎣  Caught: 0" FontSize="15"
+                           VerticalAlignment="Center" Margin="0,0,6,0" />
+                <Button Name="FishCaughtResetBtn" Content="↺" ToolTip="Reset catch count"
+                        Width="26" Height="26" FontSize="13" Padding="0"
+                        VerticalAlignment="Center" Click="FishCaughtResetBtn_Click" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <Label Name="cursor" Content="" FontSize="9" Padding="0,1" />
+                <Label Name="bar" Content="" FontSize="9" Padding="2,1" />
+              </StackPanel>
+              <TextBlock Name="VersionLabel" Text="v2.2.2" FontSize="11"
+                         HorizontalAlignment="Left" Margin="0,6,0,0" />
+            </StackPanel>
+
+            <!-- Right: Auto-Scale + Start (Start stretches to match left column height) -->
+            <Grid Grid.Column="1" Margin="16,0,0,0">
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+              <StackPanel Grid.Row="0">
+                <Button Name="PreConfigBtn" HorizontalAlignment="Right" Style="{StaticResource btnRoundDark}" Height="26" Width="155" Margin="0,0,0,3" Click="PreConfigBtn_Click">
+                  <TextBlock TextWrapping="Wrap" TextAlignment="Center" FontSize="9">1280x720  Auto-Scale</TextBlock>
+                </Button>
+                <Rectangle Name="PreConfigIndicator" Height="6" RadiusX="3" RadiusY="3" HorizontalAlignment="Center" Width="50" Margin="0,0,0,6" Fill="#FF444444" />
+              </StackPanel>
+              <Button Name="StartBtn" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                      Style="{StaticResource btnRoundDark}" Width="155" Click="StartBtn_Click">
+                <TextBlock Name="StartLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="14">Start Fishing</TextBlock>
+              </Button>
+            </Grid>
+          </Grid>
+
+        </StackPanel>
+      </GroupBox>
+
+    </Grid>
+
+
+    <!-- Settings Page Overlay -->
+    <Grid Name="SettingsPage" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+          Visibility="Collapsed" Panel.ZIndex="11">
+      <Border Name="SettingsPageBorder" Margin="5,5,5,5" CornerRadius="8" BorderThickness="1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <!-- Header -->
+          <Grid Grid.Row="0" Margin="14,10,10,8">
+            <TextBlock Name="SettingsTitleLabel" Text="Settings" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Name="SpCloseBtn" Content="✕" HorizontalAlignment="Right"
+                    Width="28" Height="28" Style="{StaticResource btnRoundDark}"
+                    Click="SpCloseBtn_Click" />
+          </Grid>
+
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <Grid Margin="10,0,10,10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="210" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+
+              <!-- LEFT: Hotkey buttons -->
+              <GroupBox Name="SpButtonsGBox" Header="Button Setup" Grid.Column="0" Margin="0,4,6,4" VerticalAlignment="Top">
+                <StackPanel Margin="4">
+                  <StackPanel Height="65" Orientation="Horizontal">
+                    <Button Name="SpMoveLeftBtn" Height="50" Width="70" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="8,0,0,0" Click="SpMoveLeftBtn_Click">
+                      <TextBlock Name="SpMoveLeftLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="22" Text="A" />
+                    </Button>
+                    <Label Name="SpMoveLeftDescription" Content="Move Left&#xD;&#xA;(Default: A)" VerticalAlignment="Center" Width="118" VerticalContentAlignment="Center" Margin="8,0,0,0" />
+                  </StackPanel>
+                  <StackPanel Height="65" Orientation="Horizontal">
+                    <Button Name="SpMoveRightBtn" Height="50" Width="70" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="8,0,0,0" Click="SpMoveRightBtn_Click">
+                      <TextBlock Name="SpMoveRightLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="22" Text="D" />
+                    </Button>
+                    <Label Name="SpMoveRightDescription" Content="Move Right&#xD;&#xA;(Default: D)" VerticalAlignment="Center" Width="118" VerticalContentAlignment="Center" Margin="8,0,0,0" />
+                  </StackPanel>
+                  <StackPanel Height="65" Orientation="Horizontal">
+                    <Button Name="SpReelInBtn" Height="50" Width="70" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="8,0,0,0" Click="SpReelInBtn_Click">
+                      <TextBlock Name="SpReelInLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="22" Text="F" />
+                    </Button>
+                    <Label Name="SpReelInDescription" Content="Reel-In&#xD;&#xA;(Default: F)" VerticalAlignment="Center" Width="118" VerticalContentAlignment="Center" Margin="8,0,0,0" />
+                  </StackPanel>
+                  <StackPanel Height="65" Orientation="Horizontal">
+                    <Button Name="SpDismissBtn" Height="50" Width="70" Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="8,0,0,0" Click="SpDismissBtn_Click">
+                      <TextBlock Name="SpDismissLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="18" Text="ESC" />
+                    </Button>
+                    <Label Name="SpDismissDescription" Content="Dismiss&#xD;&#xA;(Default: ESC)" VerticalAlignment="Center" Width="118" VerticalContentAlignment="Center" Margin="8,0,0,0" />
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
+
+              <!-- RIGHT: Delays + GPU + Discord + Reset -->
+              <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Delays -->
+                <GroupBox Name="SpDelayGBox" Header="Delays (ms)" Grid.Row="0" Margin="0,4,0,6">
+                  <Grid Margin="8,4,8,4">
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="*" />
+                      <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                      <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Label Name="SpRestartDelayLabel" Content="Restart Delay" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpRestartDelayTextBox" Grid.Row="1" Grid.Column="0" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpLagCompensationLabel" Content="Lag Comp Delay" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpLagCompensationDelayTextBox" Grid.Row="1" Grid.Column="1" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpDimissDelayLabel" Content="Dismiss Delay" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpDimissDelayTextBox" Grid.Row="3" Grid.Column="0" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpFishCaptureLabel" Content="Fish Capture Delay" Grid.Row="2" Grid.Column="1" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpFishCaptureDelayTextBox" Grid.Row="3" Grid.Column="1" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpPostCatchDelayLabel" Content="After Catch" Grid.Row="4" Grid.Column="0" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpPostCatchDelayTextBox" Grid.Row="5" Grid.Column="0" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpAfterClickDelayLabel" Content="After Esc" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <TextBox Name="SpAfterClickDelayTextBox" Grid.Row="5" Grid.Column="1" Width="80" HorizontalAlignment="Center" FontSize="14" TextAlignment="Center" Margin="0,0,0,8" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+
+                    <Label Name="SpGPULabel" Content="GPU Selection" Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" FontSize="11" Padding="2" />
+                    <ComboBox Name="SpGPUList" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" Margin="0,0,0,4" SelectionChanged="SpGPUList_SelectionChanged" />
+                  </Grid>
+                </GroupBox>
+
+                <!-- Discord -->
+                <GroupBox Name="SpDiscordGBox" Header="Discord Integration (WIP)" Grid.Row="1" Margin="0,0,0,6">
+                  <StackPanel Margin="8,4,8,4">
+                    <Label Name="SpDiscordUserIdLabel" Content="Discord User Id" FontSize="11" Padding="2" />
+                    <TextBox Name="SpDiscordUserIdTextBox" HorizontalAlignment="Stretch" FontSize="13" TextAlignment="Left" Margin="0,0,0,6" TextChanged="SpDelayTextBox_TextChanged" PreviewTextInput="SpPositiveNumbersOnlyValidation" />
+                    <Label Name="SpDiscordWebHookLabel" Content="Discord Webhook URL" FontSize="11" Padding="2" />
+                    <TextBox Name="SpDiscordWebHookTextBox" HorizontalAlignment="Stretch" FontSize="13" TextAlignment="Left" TextWrapping="Wrap" AcceptsReturn="True" Height="42" TextChanged="SpDelayTextBox_TextChanged" />
+                  </StackPanel>
+                </GroupBox>
+
+                <!-- Reset -->
+                <Button Name="SpResetBtn" Grid.Row="2" HorizontalAlignment="Right" Height="44" Width="140"
+                        Style="{StaticResource btnRoundDark}" BorderThickness="2" Margin="0,0,0,4"
+                        Click="SpResetBtn_Click">
+                  <TextBlock Name="SpResetLabel" TextWrapping="Wrap" TextAlignment="Center" FontSize="14" Text="Reset All To Default" />
+                </Button>
+              </Grid>
+            </Grid>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- FAQ Overlay Page -->
+    <Grid Name="FaqPage" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+          Visibility="Collapsed" Panel.ZIndex="10">
+      <Border Name="FaqPageBorder" Margin="5,5,5,5" CornerRadius="8" BorderThickness="1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <!-- Header -->
+          <Grid Grid.Row="0" Margin="14,10,10,8">
+            <TextBlock Name="FaqTitleLabel" Text="FAQ" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+              <Button Name="FaqVideoBtn" Content="▶  Video Setup Guide" Height="28"
+                      Style="{StaticResource btnRoundDark}" Margin="0,0,8,0" Padding="8,0"
+                      Click="FaqVideoBtn_Click" />
+              <Button Name="FaqCloseBtn" Content="✕"
+                      Width="28" Height="28" Style="{StaticResource btnRoundDark}"
+                      Click="FaqCloseBtn_Click" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Content -->
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="FaqContentPanel" Margin="14,4,14,14">
+
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,6">
+                <Run FontWeight="Bold">NTE Fisherman</Run>
+                <Run> is an automated fishing bot for NTE that handles casting, reeling, and recasting — so you don't have to watch the screen and click manually. It requires some setup, but after the first working one it doesn't really require another setup.</Run>
+              </TextBlock>
+
+              <Border Name="FaqQuoteBorder" BorderThickness="3,0,0,0" Margin="0,0,0,14" Padding="10,6">
+                <TextBlock TextWrapping="Wrap" FontSize="11" FontStyle="Italic">
+                  Follow the video/picture step by step, you won't have issues.
+                </TextBlock>
+              </Border>
+
+              <TextBlock TextWrapping="Wrap" FontSize="13" FontWeight="Bold" Margin="0,0,0,4">Recommended: Play with Full Focus</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,14">
+                Use the bot while the game is your active window. This is the most stable and reliable mode. The bot will handle all inputs cleanly and fishing will work as expected.
+              </TextBlock>
+
+              <TextBlock TextWrapping="Wrap" FontSize="13" FontWeight="Bold" Margin="0,0,0,4">Background Inputs</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,14">
+                Background Inputs now works properly and lets the bot send inputs while you're focused on another window. That said, it can still occasionally bug out — so it's best used when you're keeping an eye on the game on the side (e.g. scrolling Discord or watching a video). If you plan to go fully AFK and step away from your PC, keep the game focused for the most reliable experience.
+              </TextBlock>
+
+              <TextBlock TextWrapping="Wrap" FontSize="13" FontWeight="Bold" Margin="0,0,0,4">Starting Out at Level 1 Fishing</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,8">
+                If you're just starting, watch the bot for at least the first hour. You'll need to manually sell your fish and use the money to buy more bait to keep the cycle going. The overnight/AFK farm only becomes reliable once you have around 1,000+ bait stockpiled — anything less and you'll run out mid-session and the bot will sit idle doing nothing. Note that the fishing in NTE does not auto switch bait once you run out, so you'll have to do it manually.
+              </TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="10,0,0,2">• 99 Stacks of Basic Bait = 495 Shell</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="10,0,0,2">• Avg starting fish is 10–20 Shell</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="10,0,0,14">
+                <Run>• You need about </Run><Run FontWeight="Bold">5,445 Shell total</Run><Run> for 1k bait (more the better)</Run>
+              </TextBlock>
+
+              <TextBlock TextWrapping="Wrap" FontSize="13" FontWeight="Bold" Margin="0,0,0,4">Customizing Delays</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,6">Only delays I would recommend to touch are:</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" FontFamily="Courier New" Margin="10,0,0,2">Dismiss Delay (default: 4000)  →  2000</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" FontFamily="Courier New" Margin="10,0,0,2">After Catch (default: 1000)    →  1000</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" FontFamily="Courier New" Margin="10,0,0,0">After Esc   (default: 1000)    →  same</TextBlock>
+
+            </StackPanel>
+          </ScrollViewer>
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- Debug Log Overlay Page -->
+    <Grid Name="LogPage" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+          Visibility="Collapsed" Panel.ZIndex="9">
+      <Border Name="LogPageBorder" Margin="5,5,5,5" CornerRadius="8" BorderThickness="1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <!-- Header -->
+          <Grid Grid.Row="0" Margin="14,10,10,8">
+            <TextBlock Name="LogTitleLabel" Text="Debug Log" FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+              <Button Name="LogExportBtn" Content="Export" Width="60" Height="28"
+                      Style="{StaticResource btnRoundDark}" Margin="0,0,6,0"
+                      Click="LogExportBtn_Click" />
+              <Button Name="LogClearBtn" Content="Clear" Width="55" Height="28"
+                      Style="{StaticResource btnRoundDark}" Margin="0,0,6,0"
+                      Click="LogClearBtn_Click" />
+              <Button Name="LogCloseBtn" Content="✕" Width="28" Height="28"
+                      Style="{StaticResource btnRoundDark}"
+                      Click="LogCloseBtn_Click" />
+            </StackPanel>
+          </Grid>
+
+          <!-- Log entries list -->
+          <ListBox Name="LogListBox" Grid.Row="1" Margin="10,0,10,6"
+                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                   ScrollViewer.VerticalScrollBarVisibility="Auto"
+                   BorderThickness="1"
+                   FontFamily="Consolas" FontSize="11" />
+
+          <!-- Footer: entry count -->
+          <TextBlock Name="LogCountLabel" Grid.Row="2" Margin="14,0,14,8"
+                     FontSize="10" Text="0 entries" />
+        </Grid>
+      </Border>
+    </Grid>
+
+    <!-- Welcome / First-Run Page -->
+    <Grid Name="WelcomePage" Grid.Column="1" Grid.Row="0" Grid.RowSpan="3"
+          Visibility="Collapsed" Panel.ZIndex="12">
+      <Border Name="WelcomePageBorder" Margin="5,5,5,5" CornerRadius="8" BorderThickness="1">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <!-- Header -->
+          <Grid Grid.Row="0" Margin="14,10,10,8">
+            <TextBlock Name="WelcomeTitleLabel" Text="👋  Welcome to NTE Fisherman"
+                       FontSize="18" FontWeight="Bold" VerticalAlignment="Center" />
+            <Button Name="WelcomeCloseBtn" Content="✕" HorizontalAlignment="Right"
+                    Width="28" Height="28" Style="{StaticResource btnRoundDark}"
+                    Click="WelcomeCloseBtn_Click" />
+          </Grid>
+
+          <!-- Content -->
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Name="WelcomeContentPanel" Margin="14,4,14,10">
+
+              <TextBlock TextWrapping="Wrap" FontSize="13" FontWeight="Bold" Margin="0,0,0,6">How the bot works</TextBlock>
+              <TextBlock TextWrapping="Wrap" FontSize="12" Margin="0,0,0,16">
+                NTE Fisherman reads your screen in real-time to detect the fishing bar position, cursor location, stamina levels, and cast confirmation. It sends keyboard inputs to reel in and recast automatically. No game files are modified — the bot only observes pixel colors at the coordinates you configure in the setup panels.
+              </TextBlock>
+
+              <!-- Game focus warning -->
+              <Border Name="WelcomeFocusWarnBorder" BorderThickness="1" CornerRadius="4"
+                      BorderBrush="#FFDC3545" Padding="10,8" Margin="0,0,0,16">
+                <StackPanel>
+                  <TextBlock Text="⚠  Heads Up" FontSize="12" FontWeight="Bold"
+                             Foreground="#FFDC3545" Margin="0,0,0,5" />
+                  <TextBlock TextWrapping="Wrap" FontSize="12" Foreground="#FFDC3545">
+                    Without Background Inputs, the game must stay fully focused. Background Inputs now works properly for multitasking, but can still occasionally bug out — best when keeping an eye on the game. For fully AFK sessions, keep the game focused.
+                  </TextBlock>
+                </StackPanel>
+              </Border>
+
+              <!-- FAQ recommendation -->
+              <Border Name="WelcomeFaqBorder" BorderThickness="3,0,0,0" Padding="10,6" Margin="0,0,0,6">
+                <TextBlock TextWrapping="Wrap" FontSize="12" FontStyle="Italic">
+                  It is strongly recommended to read the FAQ before starting setup. It covers the full setup process, delay tuning, bait management, and common issues you may run into.
+                </TextBlock>
+              </Border>
+
+            </StackPanel>
+          </ScrollViewer>
+
+          <!-- Footer buttons -->
+          <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="14,6,14,12">
+            <Button Name="WelcomeFaqBtn" Content="Open FAQ" Width="90" Height="32"
+                    Style="{StaticResource btnRoundDark}" Margin="0,0,8,0"
+                    Click="WelcomeFaqBtn_Click" />
+            <Button Name="WelcomeGotItBtn" Content="Got It, Let's Go" Width="120" Height="32"
+                    Style="{StaticResource btnRoundDark}"
+                    Click="WelcomeGotItBtn_Click" />
+          </StackPanel>
+
+        </Grid>
+      </Border>
+    </Grid>
+
+  </Grid>
+</Window>
