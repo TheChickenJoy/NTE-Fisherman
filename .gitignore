@@ -36,3 +36,9 @@ Desktop.ini
 
 # Release zips (upload these to GitHub Releases instead)
 *.zip
+
+# Claude Code session data
+.claude/
+
+# VS Code workspace (contains local paths)
+*.code-workspace
