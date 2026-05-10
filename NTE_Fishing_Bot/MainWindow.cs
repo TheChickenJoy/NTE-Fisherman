@@ -276,7 +276,7 @@ public partial class MainWindow : Window, IComponentConnector
 	{
 		settings.IsAlwaysOnTop = settings.IsAlwaysOnTop == 0 ? 1 : 0;
 		Topmost = settings.IsAlwaysOnTop == 1;
-		AlwaysOnTopBtn.Opacity = settings.IsAlwaysOnTop == 1 ? 1.0 : 0.4;
+		UpdateToggleIconColors(isDarkMode);
 	}
 
 	private void HamburgerBtn_Click(object sender, RoutedEventArgs e)
@@ -359,6 +359,11 @@ public partial class MainWindow : Window, IComponentConnector
 	private void FaqCloseBtn_Click(object sender, RoutedEventArgs e)
 	{
 		FaqPage.Visibility = Visibility.Collapsed;
+	}
+
+	private void FaqWelcomeBtn_Click(object sender, RoutedEventArgs e)
+	{
+		WelcomePage.Visibility = Visibility.Visible;
 	}
 
 	private void FaqVideoBtn_Click(object sender, RoutedEventArgs e)
@@ -623,7 +628,7 @@ public partial class MainWindow : Window, IComponentConnector
 		if (turningOn)
 		{
 			MessageBoxResult result = MessageBox.Show(
-				"Background Inputs now works properly for multitasking, but can still occasionally bug out — best when keeping an eye on the game. For fully AFK sessions, keep the game focused.",
+				"Background Inputs now works properly for multitasking, but can still occasionally bug out, best when keeping an eye on the game. For fully AFK sessions, keep the game focused.",
 				"Background Inputs",
 				MessageBoxButton.OKCancel,
 				MessageBoxImage.Information);
@@ -631,22 +636,41 @@ public partial class MainWindow : Window, IComponentConnector
 		}
 		settings.IsBackgroundInput = turningOn ? 1 : 0;
 		BackgroundInputLabel.Text = settings.IsBackgroundInput == 1 ? "Background Inputs: On" : "Background Inputs: Off";
+		UpdateToggleIconColors(isDarkMode);
+	}
+
+	private void UpdateToggleIconColors(bool darkMode)
+	{
+		var offColor = darkMode ? Theme.ColorAccent5 : Theme.BlackColor;
+		AlwaysOnTopIcon.Foreground     = settings.IsAlwaysOnTop    == 1 ? Theme.GreenColor : offColor;
+		BackgroundInputIcon.Foreground = settings.IsBackgroundInput == 1 ? Theme.GreenColor : offColor;
 	}
 
 	[DllImport("user32.dll")]
 	private static extern bool GetWindowRect(IntPtr hWnd, out PreConfigRECT lpRect);
+	[DllImport("user32.dll")]
+	private static extern bool GetClientRect(IntPtr hWnd, out PreConfigRECT lpRect);
 	[DllImport("user32.dll")]
 	private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint uFlags);
 	[DllImport("user32.dll")]
 	private static extern int GetSystemMetrics(int nIndex);
 	[DllImport("user32.dll")]
 	private static extern bool ClientToScreen(IntPtr hWnd, ref System.Drawing.Point lpPoint);
+	[DllImport("user32.dll")]
+	private static extern int GetWindowLong(IntPtr hWnd, int nIndex);
+	[DllImport("user32.dll")]
+	private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
 
 	[StructLayout(LayoutKind.Sequential)]
 	private struct PreConfigRECT { public int Left, Top, Right, Bottom; }
 
-	private const uint SWP_NOSIZE   = 0x0001;
-	private const uint SWP_NOZORDER = 0x0004;
+	private const int  GWL_STYLE           = -16;
+	private const uint WS_OVERLAPPEDWINDOW = 0x00CF0000;
+	private const uint WS_VISIBLE          = 0x10000000;
+	private const uint SWP_NOSIZE          = 0x0001;
+	private const uint SWP_NOMOVE          = 0x0002;
+	private const uint SWP_NOZORDER        = 0x0004;
+	private const uint SWP_FRAMECHANGED    = 0x0020;
 
 	private IntPtr? TryGetGameHandle()
 	{
@@ -664,7 +688,7 @@ public partial class MainWindow : Window, IComponentConnector
 		}
 
 		var confirm = MessageBox.Show(
-			"Before applying Auto-Scale:\n• Set the game to 1280×720 windowed\n• Make sure NTE is running\n\nThe bot will automatically center your game window and apply all detection coordinates.\n\n⚠ Successful Cast Detect is NOT auto-configured. After applying, set it manually by clicking the button and placing it on the middle letter of your character's name.",
+			"Auto-Scale will resize and center the game window to 1280×720, then apply all detection coordinates automatically.\n\nMake sure NTE is running before continuing.\n\n⚠ Successful Cast Detect is NOT auto-configured. After applying, set it manually by clicking the button and placing it on the middle letter of your character's name.",
 			"1280x720 Auto-Scale",
 			MessageBoxButton.OKCancel,
 			MessageBoxImage.Information);
@@ -681,10 +705,26 @@ public partial class MainWindow : Window, IComponentConnector
 			return;
 		}
 
-		// Center the game window on screen
+		// Switch the game window to standard windowed mode (adds title bar + borders).
+		// This handles borderless and fullscreen — without this the resize has no chrome.
+		SetWindowLong(handle.Value, GWL_STYLE, unchecked((int)(WS_OVERLAPPEDWINDOW | WS_VISIBLE)));
+		// Force the frame to recalculate so GetClientRect returns the updated measurements.
+		SetWindowPos(handle.Value, IntPtr.Zero, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_FRAMECHANGED);
+
+		// Measure the non-client frame (title bar + borders) so we set the correct outer window size.
+		GetWindowRect(handle.Value, out PreConfigRECT outerRect);
+		GetClientRect(handle.Value, out PreConfigRECT clientRect);
+		int frameW = (outerRect.Right - outerRect.Left) - clientRect.Right;
+		int frameH = (outerRect.Bottom - outerRect.Top) - clientRect.Bottom;
+
+		int targetW = 1280 + frameW;
+		int targetH = 720  + frameH;
+
+		// Resize and center in one SetWindowPos call, re-applying SWP_FRAMECHANGED to fully commit the style.
 		int screenW = GetSystemMetrics(0);
 		int screenH = GetSystemMetrics(1);
-		SetWindowPos(handle.Value, IntPtr.Zero, (screenW - 1280) / 2, (screenH - 720) / 2, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos(handle.Value, IntPtr.Zero, (screenW - targetW) / 2, (screenH - targetH) / 2, targetW, targetH, SWP_NOZORDER | SWP_FRAMECHANGED);
+
 		if (!GetWindowRect(handle.Value, out PreConfigRECT _))
 		{
 			MessageBox.Show(
@@ -716,7 +756,7 @@ public partial class MainWindow : Window, IComponentConnector
 		settings.PlayerStaminaPoint_X     = cox + (int)Math.Round(932 * sx);  settings.PlayerStaminaPoint_Y    = coy + (int)Math.Round(22  * sy);
 		settings.CastButtonPoint_X        = cox + (int)Math.Round(1185 * sx); settings.CastButtonPoint_Y       = coy + (int)Math.Round(632 * sy);
 		settings.XpBarPoint_X             = cox + (int)Math.Round(576 * sx);  settings.XpBarPoint_Y            = coy + (int)Math.Round(85  * sy);
-		settings.DailyRewardPoint_X       = cox + (int)Math.Round(684 * sx);  settings.DailyRewardPoint_Y      = coy + (int)Math.Round(235 * sy);
+		settings.DailyRewardPoint_X       = cox + (int)Math.Round(685 * sx);  settings.DailyRewardPoint_Y      = coy + (int)Math.Round(235 * sy);
 
 		settings.MiddleBarColor_A = 255; settings.MiddleBarColor_R = 48;
 		settings.MiddleBarColor_G = 216; settings.MiddleBarColor_B = 181;
@@ -803,8 +843,8 @@ public partial class MainWindow : Window, IComponentConnector
 		DailyRewardCoords.Text = "X: " + settings.DailyRewardPoint_X + "\nY: " + settings.DailyRewardPoint_Y;
 		BackgroundInputLabel.Text = settings.IsBackgroundInput == 1 ? "Background Inputs: On" : "Background Inputs: Off";
 		Topmost = settings.IsAlwaysOnTop == 1;
-		AlwaysOnTopBtn.Opacity = settings.IsAlwaysOnTop == 1 ? 1.0 : 0.4;
 		isDarkMode = settings.IsDarkMode > 0;
+		UpdateToggleIconColors(isDarkMode);
 		MoveLeftLabel.Text = KeycodeHelper.KeycodeToString(settings.KeyCode_MoveLeft);
 		MoveRightLabel.Text = KeycodeHelper.KeycodeToString(settings.KeyCode_MoveRight);
 		UpdatePreConfigIndicator();
@@ -945,8 +985,6 @@ public partial class MainWindow : Window, IComponentConnector
 
 	private void InitTheme(bool darkModeTheme)
 	{
-		ThemeModeImg.Source = (darkModeTheme ? Theme.DayImage : Theme.NightImage);
-		SettingImg.Source = (darkModeTheme ? Theme.DaySettingImage : Theme.NightSettingImage);
 		MainWindows.Background = (darkModeTheme ? Theme.ColorAccent1 : Theme.WhiteColor);
 		MiddleBarGBox.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		MiddleBarGBox.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
@@ -1037,6 +1075,7 @@ public partial class MainWindow : Window, IComponentConnector
 		SideAlwaysOnTopLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
 		BackgroundInputLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
 		SideFaqLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
+		UpdateToggleIconColors(darkModeTheme);
 		// Log page
 		LogPageBorder.Background  = (darkModeTheme ? Theme.ColorAccent1 : Theme.WhiteColor);
 		LogPageBorder.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);

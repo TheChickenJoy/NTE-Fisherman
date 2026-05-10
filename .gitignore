@@ -1,37 +1,38 @@
 # Build output
-[Bb]in/
-[Oo]bj/
-[Dd]ebug/
-[Rr]elease/
+bin/
+obj/
 
 # Visual Studio
 .vs/
-*.suo
 *.user
+*.suo
 *.userosscache
-*.sln.docstates
+*.sln.docview
 *.userprefs
-enc_temp_folder/
-.localhistory/
-MigrationBackup/
-Generated\ Files/
 
-# WPF temp files
-*_wpftmp.csproj
+# Rider / JetBrains
+.idea/
+*.DotSettings.user
 
-# Build logs & temp
-*.binlog
-*.log
-*.tlog
-*.tmp
-*.tmp_proj
-*.pdb
+# NuGet
+packages/
+*.nupkg
+project.lock.json
 
-# Claude Code
-.claude/
-
-# User settings (personal coordinates/config)
+# User config (contains personal screen coordinates and colors)
 settings.json
 
-# VS Code workspace (keep NTE_Fishing_Bot_cs.code-workspace — useful for contributors)
-.history/
+# Logs
+*.log
+
+# Temp folders
+temp/
+tmp/
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Release zips (upload these to GitHub Releases instead)
+*.zip

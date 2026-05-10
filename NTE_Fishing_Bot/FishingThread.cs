@@ -213,7 +213,7 @@ internal class FishingThread
 			{
 				_lastDailyRewardClickAt = DateTime.UtcNow;
 				_dailyRewardDismissRunning = true;
-				BotLogger.Log("Daily reward popup detected — clicking to dismiss (3x)");
+				BotLogger.Log("Daily reward popup detected. Clicking to dismiss (3x)");
 				var drToken = _cts.Token;
 				Task.Run(async () =>
 				{
@@ -222,7 +222,7 @@ internal class FishingThread
 						for (int i = 0; i < 3; i++)
 						{
 							ClickCenterOfGame();
-							if (i < 2) await Task.Delay(500, drToken);
+							if (i < 2) await Task.Delay(3000, drToken);
 						}
 					}
 					catch (OperationCanceledException) { }
@@ -242,7 +242,7 @@ internal class FishingThread
 				                   (_castButtonVisible && state == FishingState.ResetStart);
 				if (gameResumed)
 				{
-					BotLogger.Log("Watchdog 1: post-catch exceeded 8s and game resumed — recovering");
+					BotLogger.Log("Watchdog 1: post-catch exceeded 8s and game resumed. Recovering");
 					_cts.Cancel();
 					_cts = new CancellationTokenSource();
 					_postCatchRunning = false;
@@ -255,7 +255,7 @@ internal class FishingThread
 			// Watchdog 2: task exited but state never got reset from ResetStart — recover immediately
 			if (state == FishingState.ResetStart && !_postCatchRunning)
 			{
-				BotLogger.Log("Watchdog 2: stuck in ResetStart — recovering, casting again");
+				BotLogger.Log("Watchdog 2: stuck in ResetStart. Recovering, casting again");
 				state = FishingState.NotFishing;
 				castButtonWasDetected = false;
 				_statusMessage = "Casting again...";
@@ -335,7 +335,7 @@ internal class FishingThread
 							state = FishingState.CaptureStart;
 							_captureStartEnteredAt = DateTime.UtcNow;
 							_xpBarSeenThisCycle = false;
-							BotLogger.Log($"State: Fishing → CaptureStart (stamina gone 500ms — fish:{fishStaminaDetected} player:{playerStaminaDetected})");
+							BotLogger.Log($"State: Fishing → CaptureStart (stamina gone 500ms, fish:{fishStaminaDetected} player:{playerStaminaDetected})");
 						}
 					}
 					else
@@ -350,7 +350,7 @@ internal class FishingThread
 					_fishCapturedNormally = true;
 					_statusMessage = "Caught fish!";
 					state = FishingState.Captured;
-					BotLogger.Log("State: CaptureStart → Captured (XP bar detected — fish caught!)");
+					BotLogger.Log("State: CaptureStart → Captured (XP bar detected. Fish caught!)");
 					OnFishCaught?.Invoke();
 				}
 				else if (_captureStartEnteredAt.HasValue &&
@@ -359,7 +359,7 @@ internal class FishingThread
 					_fishCapturedNormally = false;
 					_statusMessage = "No EXP detected, dismissing anyway...";
 					state = FishingState.Captured;
-					BotLogger.Log("State: CaptureStart → Captured (12s timeout — no XP bar, treating as escaped)");
+					BotLogger.Log("State: CaptureStart → Captured (12s timeout. No XP bar, treating as escaped)");
 				}
 				else
 				{
@@ -391,7 +391,7 @@ internal class FishingThread
 		};
 		isRunning = true;
 		_startTime = DateTime.UtcNow;
-		BotLogger.Log($"Bot started — game handle: {(GameHandle.HasValue ? "found" : "NOT found (simulation mode)")}");
+		BotLogger.Log($"Bot started. Game handle: {(GameHandle.HasValue ? "found" : "NOT found (simulation mode)")}");
 		screenStateLogger.Start();
 
 		// Mirrors the F-spam loop in post-catch so the very first cycle behaves the same as every
@@ -912,7 +912,7 @@ internal class FishingThread
 						else castStableMs = 0;
 						if (castStableMs >= 5000)
 						{
-							BotLogger.Log("Post-catch: cast-ready stable 5s, no XP bar — fast genuine escape");
+							BotLogger.Log("Post-catch: cast-ready stable 5s, no XP bar. Fast genuine escape");
 							break;
 						}
 					}
@@ -927,7 +927,7 @@ internal class FishingThread
 							visWaitMs += 100;
 						}
 						_statusMessage = "Dismissing dialog...";
-						BotLogger.Log("Post-catch: XP bar confirmed — dismissing caught fish display");
+						BotLogger.Log("Post-catch: XP bar confirmed. Dismissing caught fish display");
 						ClickCenterOfGame();
 						await Task.Delay(800, token);
 						int dismissRetries = 0;
@@ -935,7 +935,7 @@ internal class FishingThread
 						{
 							dismissRetries++;
 							_statusMessage = $"XP bar still visible, retrying ({dismissRetries})...";
-							BotLogger.Log($"Post-catch: XP bar still visible — retrying dismiss ({dismissRetries}/8)");
+							BotLogger.Log($"Post-catch: XP bar still visible. Retrying dismiss ({dismissRetries}/8)");
 							ClickCenterOfGame();
 							await Task.Delay(500, token);
 						}
@@ -944,7 +944,7 @@ internal class FishingThread
 					}
 					else
 					{
-						BotLogger.Log("Post-catch: no XP bar after 15s — genuine escape, waiting cooldown");
+						BotLogger.Log("Post-catch: no XP bar after 15s. Genuine escape, waiting cooldown");
 						_statusMessage = "Fish escaped...";
 						await Task.Delay(settings.Delay_AfterClick, token);
 					}
@@ -955,7 +955,7 @@ internal class FishingThread
 					if (capturedNormally)
 					{
 						_statusMessage = "Dismissing dialog...";
-						BotLogger.Log("Post-catch: XP bar not configured, capturedNormally — dismissing");
+						BotLogger.Log("Post-catch: XP bar not configured, capturedNormally. Dismissing");
 						ClickCenterOfGame();
 						await Task.Delay(800, token);
 						int dismissRetries = 0;
@@ -963,7 +963,7 @@ internal class FishingThread
 						{
 							dismissRetries++;
 							_statusMessage = $"XP bar still visible, retrying ({dismissRetries})...";
-							BotLogger.Log($"Post-catch: XP bar still visible — retrying dismiss ({dismissRetries}/8)");
+							BotLogger.Log($"Post-catch: XP bar still visible. Retrying dismiss ({dismissRetries}/8)");
 							ClickCenterOfGame();
 							await Task.Delay(500, token);
 						}
@@ -972,7 +972,7 @@ internal class FishingThread
 					}
 					else
 					{
-						BotLogger.Log("Post-catch: XP bar not configured, fish escaped — waiting cooldown");
+						BotLogger.Log("Post-catch: XP bar not configured, fish escaped. Waiting cooldown");
 						_statusMessage = "Fish escaped...";
 						await Task.Delay(settings.Delay_AfterClick, token);
 					}
@@ -981,7 +981,7 @@ internal class FishingThread
 				// Fallback: if XP bar is still somehow visible, keep clicking until it clears
 				if (_xpBarVisible && isRunning)
 				{
-					BotLogger.Log("Post-catch: XP bar persists after retries — fallback clicking every 2s");
+					BotLogger.Log("Post-catch: XP bar persists after retries. Fallback clicking every 2s");
 					while (_xpBarVisible && isRunning)
 					{
 						_statusMessage = "XP bar stuck, clicking...";
@@ -1004,9 +1004,9 @@ internal class FishingThread
 						castWaitMs += 100;
 					}
 					if (_castButtonVisible && !_xpBarVisible)
-						BotLogger.Log("Post-catch: cast button visible — game is ready");
+						BotLogger.Log("Post-catch: cast button visible. Game is ready");
 					else
-						BotLogger.Log("Post-catch: cast button wait timed out — casting anyway");
+						BotLogger.Log("Post-catch: cast button wait timed out. Casting anyway");
 				}
 				await Task.Delay(200, token);
 				state = FishingState.NotFishing;
@@ -1026,12 +1026,12 @@ internal class FishingThread
 					PressCastKey(silent: true);
 					BotLogger.UpdateLast($"Waiting: spammed F (x{spamCount + 1})");
 				}
-				BotLogger.Log("Fishing bar detected — stopping F spam");
+				BotLogger.Log("Fishing bar detected. Stopping F spam");
 			}
 			catch (OperationCanceledException) { }
 			catch (Exception ex)
 			{
-				BotLogger.Log($"Post-catch: unexpected error — {ex.GetType().Name}: {ex.Message}");
+				BotLogger.Log($"Post-catch: unexpected error. {ex.GetType().Name}: {ex.Message}");
 				state = FishingState.NotFishing;
 				castButtonWasDetected = false;
 				_statusMessage = "Casting again...";

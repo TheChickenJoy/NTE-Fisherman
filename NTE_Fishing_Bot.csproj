@@ -1,0 +1,84 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>NTE_Fishing_Bot</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>True</UseWPF>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <OutputPath>bin\Release\v2.2.3\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <RootNamespace />
+  </PropertyGroup>
+  <ItemGroup>
+    <None Remove="img\night.png" />
+    <None Remove="img\setting_night.png" />
+    <None Remove="img\setting_day.png" />
+    <None Remove="img\info_night.png" />
+    <None Remove="img\day.png" />
+    <None Remove="img\arrow_night.png" />
+    <None Remove="img\info_day.png" />
+    <None Remove="img\arrow_day.png" />
+    <None Remove="img\chibi.png" />
+    <Resource Include="img\night.png" />
+    <Resource Include="img\setting_night.png" />
+    <Resource Include="img\setting_day.png" />
+    <Resource Include="img\info_night.png" />
+    <Resource Include="img\day.png" />
+    <Resource Include="img\arrow_night.png" />
+    <Resource Include="img\info_day.png" />
+    <Resource Include="img\arrow_day.png" />
+    <Resource Include="img\chibi.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\ToF_Fishing_Bot\runtimes\**\*">
+      <Link>runtimes\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ToF_Fishing_Bot\runtimes\win-x64\native\OpenCvSharpExtern.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\ToF_Fishing_Bot\runtimes\win-x64\native\opencv_videoio_ffmpeg460_64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="WindowsInput">
+      <HintPath>..\ToF_Fishing_Bot\WindowsInput.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp">
+      <HintPath>..\ToF_Fishing_Bot\OpenCvSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="WindowsHook">
+      <HintPath>..\ToF_Fishing_Bot\WindowsHook.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.DXGI">
+      <HintPath>..\ToF_Fishing_Bot\SharpDX.DXGI.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Direct3D11">
+      <HintPath>..\ToF_Fishing_Bot\SharpDX.Direct3D11.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX">
+      <HintPath>..\ToF_Fishing_Bot\SharpDX.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenCvSharp.Extensions">
+      <HintPath>..\ToF_Fishing_Bot\OpenCvSharp.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="Config.Net">
+      <HintPath>..\ToF_Fishing_Bot\Config.Net.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>..\ToF_Fishing_Bot\Castle.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+</Project>

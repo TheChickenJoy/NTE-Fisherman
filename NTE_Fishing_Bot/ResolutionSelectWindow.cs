@@ -9,9 +9,9 @@ internal class ResolutionSelectWindow : Window
 {
     private static readonly (string Label, int MonW, int MonH, int GameW, int GameH)[] Presets =
     {
-        ("Windowed 1280×720  —  2560×1440 monitor", 2560, 1440, 1280, 720),
-        ("Windowed 1280×720  —  1920×1080 monitor", 1920, 1080, 1280, 720),
-        ("Windowed 1280×720  —  3840×2160 monitor", 3840, 2160, 1280, 720),
+        ("Windowed 1280×720, 2560×1440 Monitor", 2560, 1440, 1280, 720),
+        ("Windowed 1280×720, 1920×1080 Monitor", 1920, 1080, 1280, 720),
+        ("Windowed 1280×720, 3840×2160 Monitor", 3840, 2160, 1280, 720),
     };
 
     private const int BASE_GAME_W = 1280;
@@ -76,7 +76,7 @@ internal class ResolutionSelectWindow : Window
         warnBorder.Child = new TextBlock
         {
             Text = "⚠  After applying, you must manually set up Successful Cast Detect in the settings. " +
-                   "Place it on your player's username — aim for the middle-most letter of the name if possible. " +
+                   "Place it on your player's username, aim for the middlemost letter of the name if possible. " +
                    "Pre-configured does not auto-calibrate that detection area.",
             FontSize = 11,
             Foreground = new SolidColorBrush(Color.FromRgb(0xE6, 0xA8, 0x17)),
