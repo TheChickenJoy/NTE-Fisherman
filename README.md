@@ -6,7 +6,7 @@
 # NTE-Fisherman
 A fishing bot using OpenCVSharp and SharpDX, originally a Tower of Fantasy bot made by mdnpascual and repurposed for Nevernes to Everness.
 
-**NTE Fisherman** is an automated fishing bot for NTE that handles casting, reeling, and recasting — so you don't have to watch the screen and click manually. It requires some setup, but after the first working one it doesn't really require another setup.
+**NTE Fisherman** is an automated fishing bot for NTE that handles casting, reeling, and recasting so you don't have to watch the screen and click manually. It requires some setup, but after the first working one it doesn't really require another setup.
 
 > Follow the video/picture step by step, you won't have issues. [Setup Guide](https://youtu.be/pxeqgBSCB0U)
 
@@ -37,7 +37,7 @@ Click the picker button, then click the exact pixel on your screen. The bot stor
 1. **Casting** — Bot detects the blue cast button and presses the cast key (`F` by default).
 2. **Fishing minigame** — Holds `A` or `D` to keep the cursor inside the green zone.
 3. **End of minigame** — When stamina bars disappear, enters the capture phase.
-4. **XP bar wait** — Waits up to 15 seconds for the XP bar to appear. This handles long rare-fish catch animations where the cast button area becomes visible before the XP bar shows up — the bot never treats cast-button visibility alone as a genuine escape during this phase. Post-catch genuine-escape detection uses cast-ready stability (5 s with no XP bar).
+4. **XP bar wait** — Waits up to 15 seconds for the XP bar to appear. This handles long rare-fish catch animations where the cast button area becomes visible before the XP bar shows up, the bot never treats cast-button visibility alone as a genuine escape during this phase. Post-catch genuine-escape detection uses cast-ready stability (5 s with no XP bar).
 5. **Dismiss** — Clicks to dismiss the catch dialog, retrying up to 8 times if the bar stays visible.
 6. **Recast** — Casts again and repeats.
 
@@ -55,7 +55,7 @@ Background Inputs now works properly and lets the bot send inputs while you're f
 
 ## Starting Out at Level 1 Fishing
 
-If you're just starting, watch the bot for at least the first hour. You'll need to manually sell your fish and use the money to buy more bait to keep the cycle going. The overnight/AFK farm only becomes reliable once you have around **1,000+ bait** stockpiled — anything less and you'll run out mid-session and the bot will sit idle doing nothing. Note that the fishing in NTE does not auto switch bait once you run out, so you'll have to do it manually.
+If you're just starting, watch the bot for at least the first hour. You'll need to manually sell your fish and use the money to buy more bait to keep the cycle going. The overnight/AFK farm only becomes reliable once you have around **1,000+ bait** stockpiled, anything less and you'll run out mid-session and the bot will sit idle doing nothing. Note that the fishing in NTE does not auto switch bait once you run out, so you'll have to do it manually.
 
 - 99 Stacks of Basic Bait = 495 Shell
 - Avg starting fish is 10–20 Shell
