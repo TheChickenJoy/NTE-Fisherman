@@ -64,6 +64,14 @@ If you're just starting, watch the bot for at least the first hour. You'll need 
 
 ---
 
+## Fishing Recommendation Spot
+
+<p align="center">
+  <img width="2311" height="1439" alt="image" src="https://github.com/user-attachments/assets/cd92204d-ac52-43d7-b729-28f56e7c9dd3" />
+</p>
+
+---
+
 ## Troubleshooting
 
 **Bot never detects a fish bite.** Check that Fish Stamina and Player Stamina points turn green during the minigame.
