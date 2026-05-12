@@ -52,6 +52,11 @@ public partial class MainWindow : Window, IComponentConnector
 
 	private int _fishCaughtCount = 0;
 
+	private int _baitCount = 0;
+
+	private DispatcherTimer _sessionTimer;
+	private TimeSpan _sessionTime;
+
 	private System.Windows.Media.Color activeColor;
 
 	private Button activeButton;
@@ -90,11 +95,18 @@ public partial class MainWindow : Window, IComponentConnector
 			timer.Interval = new TimeSpan(0, 0, 0, 0, 50);
 			timer.Tick += timer_Tick;
 		}
+		_sessionTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+		_sessionTimer.Tick += (s, e) =>
+		{
+			_sessionTime = _sessionTime.Add(TimeSpan.FromSeconds(1));
+			SessionTimerLabel.Text = $"Session: {_sessionTime:mm\\:ss}";
+		};
 		base.Closing += MainWindow_Closing;
 		BotLogger.EntryAdded += OnBotLogEntry;
 		BotLogger.LastEntryUpdated += OnBotLogEntryUpdated;
 		fishBot = new FishingThread(settings, LeftBox, RightBox, cursor, bar, StatusLabel, middleBarImage, cursorImage, castReadyImage, FishStaminaIndicator, PlayerStaminaIndicator, CastBtnIndicator, XpBarIndicator, DailyRewardIndicator, EscBox, FBox, null);
 		fishBot.OnFishCaught = OnFishCaughtCallback;
+		fishBot.OnCycleComplete = OnCycleCompleteCallback;
 		fishBotThread = new Thread(fishBot.Start);
 		if (settings.IsFirstRun == 1)
 			WelcomePage.Visibility = Visibility.Visible;
@@ -133,7 +145,7 @@ public partial class MainWindow : Window, IComponentConnector
 		}
 		if (inCoordSelectMode)
 		{
-			activeCoordsLabel.Text = "X: " + e.Location.X + "\nY: " + e.Location.Y;
+			activeCoordsLabel.Text = "X: " + e.Location.X + "  Y: " + e.Location.Y;
 		}
 	}
 
@@ -174,6 +186,7 @@ public partial class MainWindow : Window, IComponentConnector
 		if (SettingsPage.Visibility == Visibility.Visible)
 			m_GlobalHook.KeyUp -= SpGlobalHookKeyUp;
 		timer.Stop();
+		_sessionTimer?.Stop();
 		fishBot.Stop();
 		inEyeDropMode = false;
 		inCoordSelectMode = false;
@@ -282,8 +295,11 @@ public partial class MainWindow : Window, IComponentConnector
 	private void HamburgerBtn_Click(object sender, RoutedEventArgs e)
 	{
 		sideMenuExpanded = !sideMenuExpanded;
-		SideMenuBorder.Width = sideMenuExpanded ? 155 : 44;
+		SideMenuBorder.Width = sideMenuExpanded ? 200 : 44;
 		var vis = sideMenuExpanded ? Visibility.Visible : Visibility.Collapsed;
+		var align = sideMenuExpanded ? HorizontalAlignment.Left : HorizontalAlignment.Center;
+		BrandHeader.Visibility = vis;
+		BrandSeparator.Visibility = vis;
 		CloseMenuLabel.Visibility = vis;
 		SideSettingLabel.Visibility = vis;
 		SideThemeLabel.Visibility = vis;
@@ -292,6 +308,8 @@ public partial class MainWindow : Window, IComponentConnector
 		SideFaqLabel.Visibility = vis;
 		SideLogLabel.Visibility = vis;
 		SideKofiLabel.Visibility = vis;
+		foreach (var btn in new[] { SettingBtn, ThemeModeBtn, AlwaysOnTopBtn, BackgroundInputBtn, FaqBtn, LogBtn, KofiBtn })
+			btn.HorizontalContentAlignment = align;
 	}
 
 	private void FaqBtn_Click(object sender, RoutedEventArgs e)
@@ -356,6 +374,66 @@ public partial class MainWindow : Window, IComponentConnector
 		FishCaughtLabel.Text = "🎣  Caught: 0";
 	}
 
+	private bool OnCycleCompleteCallback()
+	{
+		if (_baitCount <= 0) return true;
+		_baitCount--;
+		if (_baitCount == 0)
+		{
+			Dispatcher.InvokeAsync(StopBotDueToBaitDepletion);
+			return false;
+		}
+		Dispatcher.InvokeAsync(UpdateBaitDisplay);
+		return true;
+	}
+
+	private void StopBotDueToBaitDepletion()
+	{
+		BotLogger.Log("Out of bait. Stopping bot.");
+		fishBot.Stop();
+		_sessionTimer?.Stop();
+		fishBot = new FishingThread(settings, LeftBox, RightBox, cursor, bar, StatusLabel, middleBarImage, cursorImage, castReadyImage, FishStaminaIndicator, PlayerStaminaIndicator, CastBtnIndicator, XpBarIndicator, DailyRewardIndicator, EscBox, FBox, null);
+		fishBot.OnFishCaught = OnFishCaughtCallback;
+		fishBot.OnCycleComplete = OnCycleCompleteCallback;
+		fishBotThread = new Thread(fishBot.Start);
+		StartLabel.Text = "Start\nFishing";
+		UpdateBaitDisplay();
+	}
+
+	private void UpdateBaitDisplay()
+	{
+		if (_baitCount <= 0)
+		{
+			BaitRemainingLabel.Text = "Unlimited";
+			BaitRemainingLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0x88, 0x88, 0x88));
+		}
+		else if (_baitCount <= 10)
+		{
+			BaitRemainingLabel.Text = _baitCount.ToString();
+			BaitRemainingLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 80, 80));
+		}
+		else if (_baitCount <= 50)
+		{
+			BaitRemainingLabel.Text = _baitCount.ToString();
+			BaitRemainingLabel.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 165, 0));
+		}
+		else
+		{
+			BaitRemainingLabel.Text = _baitCount.ToString();
+			BaitRemainingLabel.Foreground = isDarkMode ? Theme.ColorAccent4 : Theme.BlackColor;
+		}
+	}
+
+	private void BaitCountTextBox_TextChanged(object sender, TextChangedEventArgs e)
+	{
+		if (fishBot.isRunning) return;
+		if (int.TryParse(BaitCountTextBox.Text, out int val) && val > 0)
+			_baitCount = val;
+		else
+			_baitCount = 0;
+		UpdateBaitDisplay();
+	}
+
 	private void FaqCloseBtn_Click(object sender, RoutedEventArgs e)
 	{
 		FaqPage.Visibility = Visibility.Collapsed;
@@ -369,6 +447,37 @@ public partial class MainWindow : Window, IComponentConnector
 	private void FaqVideoBtn_Click(object sender, RoutedEventArgs e)
 	{
 		Process.Start(new ProcessStartInfo { FileName = "https://www.youtube.com/watch?v=pxeqgBSCB0U", UseShellExecute = true });
+	}
+
+	private void FaqGithubBtn_Click(object sender, RoutedEventArgs e)
+	{
+		Process.Start(new ProcessStartInfo { FileName = "https://github.com/TheChickenJoy/NTE-Fisherman", UseShellExecute = true });
+	}
+
+	private void ResetPositionsBtn_Click(object sender, RoutedEventArgs e)
+	{
+		settings.UpperLeftBarPoint_X = 0;  settings.UpperLeftBarPoint_Y = 0;
+		settings.LowerRightBarPoint_X = 0; settings.LowerRightBarPoint_Y = 0;
+		settings.FishStaminaPoint_X = 0;   settings.FishStaminaPoint_Y = 0;
+		settings.PlayerStaminaPoint_X = 0; settings.PlayerStaminaPoint_Y = 0;
+		settings.CastButtonPoint_X = 0;    settings.CastButtonPoint_Y = 0;
+		settings.XpBarPoint_X = 0;         settings.XpBarPoint_Y = 0;
+		settings.DailyRewardPoint_X = 0;   settings.DailyRewardPoint_Y = 0;
+		ReadSettings();
+	}
+
+	private void UpdateSetupStatus()
+	{
+		var accent = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x7F, 0xA8, 0xC8));
+		bool mb = settings.UpperLeftBarPoint_X != 0 && settings.LowerRightBarPoint_X != 0;
+		bool det = settings.CastButtonPoint_X != 0 && settings.XpBarPoint_X != 0;
+		bool stam = settings.FishStaminaPoint_X != 0 && settings.PlayerStaminaPoint_X != 0;
+		StatusMiddleBarIcon.Text = mb   ? "✓" : "○";
+		StatusMiddleBarIcon.Foreground  = mb   ? Theme.GreenColor : accent;
+		StatusDetectionIcon.Text = det  ? "✓" : "○";
+		StatusDetectionIcon.Foreground  = det  ? Theme.GreenColor : accent;
+		StatusStaminaIcon.Text = stam   ? "✓" : "○";
+		StatusStaminaIcon.Foreground    = stam ? Theme.GreenColor : accent;
 	}
 
 	private void DismissWelcomePage()
@@ -827,20 +936,20 @@ public partial class MainWindow : Window, IComponentConnector
 		PlayerStaminaColorBtn.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb((byte)settings.PlayerStaminaColor_A, (byte)settings.PlayerStaminaColor_R, (byte)settings.PlayerStaminaColor_G, (byte)settings.PlayerStaminaColor_B));
 		tempColor = System.Drawing.Color.FromArgb(System.Drawing.Color.FromArgb(settings.PlayerStaminaColor_A, settings.PlayerStaminaColor_R, settings.PlayerStaminaColor_G, settings.PlayerStaminaColor_B).ToArgb() ^ 0xFFFFFF);
 		PlayerStaminaColorLabel.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(tempColor.A, tempColor.R, tempColor.G, tempColor.B));
-		FishStaminaCoords.Text = "X: " + settings.FishStaminaPoint_X + "\nY: " + settings.FishStaminaPoint_Y;
-		PlayerStaminaCoords.Text = "X: " + settings.PlayerStaminaPoint_X + "\nY: " + settings.PlayerStaminaPoint_Y;
-		UpperLeftCoords.Text = "X: " + settings.UpperLeftBarPoint_X + "\nY: " + settings.UpperLeftBarPoint_Y;
-		LowerRightCoords.Text = "X: " + settings.LowerRightBarPoint_X + "\nY: " + settings.LowerRightBarPoint_Y;
-		CastBtnCoords.Text = "X: " + settings.CastButtonPoint_X + "\nY: " + settings.CastButtonPoint_Y;
+		FishStaminaCoords.Text = "X: " + settings.FishStaminaPoint_X + "  Y: " + settings.FishStaminaPoint_Y;
+		PlayerStaminaCoords.Text = "X: " + settings.PlayerStaminaPoint_X + "  Y: " + settings.PlayerStaminaPoint_Y;
+		UpperLeftCoords.Text = "X: " + settings.UpperLeftBarPoint_X + "  Y: " + settings.UpperLeftBarPoint_Y;
+		LowerRightCoords.Text = "X: " + settings.LowerRightBarPoint_X + "  Y: " + settings.LowerRightBarPoint_Y;
+		CastBtnCoords.Text = "X: " + settings.CastButtonPoint_X + "  Y: " + settings.CastButtonPoint_Y;
 		CastBtnBtn.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)settings.CastButtonColor_R, (byte)settings.CastButtonColor_G, (byte)settings.CastButtonColor_B));
 		XpBarColorBtn.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb((byte)settings.XpBarColor_A, (byte)settings.XpBarColor_R, (byte)settings.XpBarColor_G, (byte)settings.XpBarColor_B));
 		tempColor = System.Drawing.Color.FromArgb(System.Drawing.Color.FromArgb(settings.XpBarColor_A, settings.XpBarColor_R, settings.XpBarColor_G, settings.XpBarColor_B).ToArgb() ^ 0xFFFFFF);
 		XpBarColorLabel.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(tempColor.A, tempColor.R, tempColor.G, tempColor.B));
-		XpBarCoords.Text = "X: " + settings.XpBarPoint_X + "\nY: " + settings.XpBarPoint_Y;
+		XpBarCoords.Text = "X: " + settings.XpBarPoint_X + "  Y: " + settings.XpBarPoint_Y;
 		DailyRewardBtn.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, (byte)settings.DailyRewardColor_R, (byte)settings.DailyRewardColor_G, (byte)settings.DailyRewardColor_B));
 		tempColor = System.Drawing.Color.FromArgb(System.Drawing.Color.FromArgb(255, settings.DailyRewardColor_R, settings.DailyRewardColor_G, settings.DailyRewardColor_B).ToArgb() ^ 0xFFFFFF);
 		DailyRewardLabel.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(tempColor.A, tempColor.R, tempColor.G, tempColor.B));
-		DailyRewardCoords.Text = "X: " + settings.DailyRewardPoint_X + "\nY: " + settings.DailyRewardPoint_Y;
+		DailyRewardCoords.Text = "X: " + settings.DailyRewardPoint_X + "  Y: " + settings.DailyRewardPoint_Y;
 		BackgroundInputLabel.Text = settings.IsBackgroundInput == 1 ? "Background Inputs: On" : "Background Inputs: Off";
 		Topmost = settings.IsAlwaysOnTop == 1;
 		isDarkMode = settings.IsDarkMode > 0;
@@ -848,6 +957,7 @@ public partial class MainWindow : Window, IComponentConnector
 		MoveLeftLabel.Text = KeycodeHelper.KeycodeToString(settings.KeyCode_MoveLeft);
 		MoveRightLabel.Text = KeycodeHelper.KeycodeToString(settings.KeyCode_MoveRight);
 		UpdatePreConfigIndicator();
+		UpdateSetupStatus();
 	}
 
 	private bool WriteSettings()
@@ -919,6 +1029,21 @@ public partial class MainWindow : Window, IComponentConnector
 		return true;
 	}
 
+	private void AutoConfigureCastButton(IntPtr handle)
+	{
+		GetClientRect(handle, out PreConfigRECT clientRect);
+		double sx = clientRect.Right  / 1280.0;
+		double sy = clientRect.Bottom / 720.0;
+		var pt = new System.Drawing.Point((int)Math.Round(1185 * sx), (int)Math.Round(632 * sy));
+		ClientToScreen(handle, ref pt);
+		settings.CastButtonPoint_X = pt.X;
+		settings.CastButtonPoint_Y = pt.Y;
+		settings.CastButtonColor_R = 32;
+		settings.CastButtonColor_G = 124;
+		settings.CastButtonColor_B = 255;
+		ReadSettings();
+	}
+
 	private void StartBtn_Click(object sender, RoutedEventArgs e)
 	{
 		if (!SanityCheck())
@@ -926,10 +1051,20 @@ public partial class MainWindow : Window, IComponentConnector
 			return;
 		}
 		IntPtr? gameHandle = GetGameHandle();
+		if (gameHandle.HasValue)
+			AutoConfigureCastButton(gameHandle.Value);
 		if (!fishBot.isRunning)
 		{
+			if (int.TryParse(BaitCountTextBox.Text, out int baitVal) && baitVal > 0)
+				_baitCount = baitVal;
+			else
+				_baitCount = 0;
+			UpdateBaitDisplay();
 			fishBot.isRunning = true;
 			StartLabel.Text = "Stop\nFishing";
+			_sessionTime = TimeSpan.Zero;
+			SessionTimerLabel.Text = "Session: 00:00";
+			_sessionTimer.Start();
 			if (!fishBotThread.IsAlive)
 			{
 				fishBot.GameHandle = gameHandle;
@@ -939,9 +1074,16 @@ public partial class MainWindow : Window, IComponentConnector
 		else
 		{
 			fishBot.Stop();
+			_sessionTimer.Stop();
 			StartLabel.Text = "Start\nFishing";
+			if (int.TryParse(BaitCountTextBox.Text, out int baitVal) && baitVal > 0)
+				_baitCount = baitVal;
+			else
+				_baitCount = 0;
+			UpdateBaitDisplay();
 			fishBot = new FishingThread(settings, LeftBox, RightBox, cursor, bar, StatusLabel, middleBarImage, cursorImage, castReadyImage, FishStaminaIndicator, PlayerStaminaIndicator, CastBtnIndicator, XpBarIndicator, DailyRewardIndicator, EscBox, FBox, gameHandle);
 			fishBot.OnFishCaught = OnFishCaughtCallback;
+			fishBot.OnCycleComplete = OnCycleCompleteCallback;
 			fishBotThread = new Thread(fishBot.Start);
 		}
 	}
@@ -985,19 +1127,40 @@ public partial class MainWindow : Window, IComponentConnector
 
 	private void InitTheme(bool darkModeTheme)
 	{
+		var cardBg     = darkModeTheme ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x0F, 0x1D, 0x2E)) : new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF5, 0xF8, 0xFF));
+		var cardBorder = darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor;
+		var cardFg     = darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor;
+		var sideBg     = darkModeTheme ? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x08, 0x12, 0x1E)) : new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF0, 0xF4, 0xFA));
+
 		MainWindows.Background = (darkModeTheme ? Theme.ColorAccent1 : Theme.WhiteColor);
-		MiddleBarGBox.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
-		MiddleBarGBox.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
-		StaminaGBox.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
-		StaminaGBox.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
-		DetectionGBox.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
-		DetectionGBox.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
-		OutputGBox.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
-		OutputGBox.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
+		SideMenuBorder.Background = sideBg;
+
+		foreach (var card in new GroupBox[] { MiddleBarCard, DetectionCard, StaminaCard, OutputCard, StatusPanelCard, KeybindCard, BarMaskCard })
+		{
+			card.Background  = cardBg;
+			card.BorderBrush = cardBorder;
+			card.Foreground  = cardFg;
+		}
+
+		MiddleBarSectionTitle.Foreground  = cardFg;
+		DetectionSectionTitle.Foreground  = cardFg;
+		StaminaSectionTitle.Foreground    = cardFg;
+StatusMiddleBarText.Foreground    = cardFg;
+		StatusDetectionText.Foreground    = cardFg;
+		StatusStaminaText.Foreground      = cardFg;
+
+		BaitCounterBorder.BorderBrush = cardBorder;
+		BaitCounterBorder.Background  = darkModeTheme
+			? new SolidColorBrush(System.Windows.Media.Color.FromRgb(0x0D, 0x1E, 0x30))
+			: new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xF2, 0xF7, 0xFF));
+		UpdateBaitDisplay();
+		UpdateSetupStatus();
+
 		cursor.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		bar.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		StatusLabel.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		FishCaughtLabel.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
+		SessionTimerLabel.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		VersionLabel.Foreground = (darkModeTheme ? Theme.ColorAccent4 : Theme.BlackColor);
 		if (FishCaughtResetBtn.Background.ToString().Equals(Theme.ButtonDefaultBGColor.ToString()) || FishCaughtResetBtn.Background.ToString().Equals(Theme.ColorAccent2.ToString()))
 		{
@@ -1070,6 +1233,7 @@ public partial class MainWindow : Window, IComponentConnector
 		BackgroundInputBtn.Style = (darkModeTheme ? Theme.SideMenuDarkStyle : Theme.SideMenuLightStyle);
 		FaqBtn.Style = (darkModeTheme ? Theme.SideMenuDarkStyle : Theme.SideMenuLightStyle);
 		SideMenuBorder.BorderBrush = (darkModeTheme ? Theme.ColorAccent2 : Theme.GBoxDefaultBorderColor);
+		TextElement.SetForeground(BrandHeader, darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
 		SideSettingLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
 		SideThemeLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);
 		SideAlwaysOnTopLabel.Foreground = (darkModeTheme ? Theme.ColorAccent5 : Theme.BlackColor);

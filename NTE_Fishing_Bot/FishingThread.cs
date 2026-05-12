@@ -117,6 +117,8 @@ internal class FishingThread
 
 	public Action OnFishCaught;
 
+	public Func<bool> OnCycleComplete;
+
 	private CancellationTokenSource _cts = new CancellationTokenSource();
 
 	private FishingState state;
@@ -1009,9 +1011,16 @@ internal class FishingThread
 						BotLogger.Log("Post-catch: cast button wait timed out. Casting anyway");
 				}
 				await Task.Delay(200, token);
-				state = FishingState.NotFishing;
 				_statusMessage = "Casting again...";
 				BotLogger.Log("Post-catch: casting again");
+				if (OnCycleComplete != null && !OnCycleComplete())
+				{
+					BotLogger.Log("Out of bait. Bot stopped.");
+					isRunning = false;
+					_statusMessage = "Out of bait.";
+					return;
+				}
+				state = FishingState.NotFishing;
 				PressCastKey();
 				_lastResetTime = DateTime.UtcNow;
 

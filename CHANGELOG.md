@@ -2,6 +2,25 @@
 
 ---
 
+## Version 2.5
+
+- Full UI rework with a dark navy card layout and cleaner sidebar navigation.
+- Setup is now split into 3 numbered sections: Middle Bar Setup, Detection Setup, and Stamina Setup.
+- Added a setup status panel with a chibi image and checkmarks for each completed section.
+- Added a session timer that shows how long the current bot session has been running.
+- Added a bait counter with a text field. Leave it blank for unlimited.
+- Added a bar preview panel showing the fishing bar and cursor images live.
+- Added a key input display showing which keys the bot is currently pressing.
+- Sidebar collapses to icon-only mode and expands back with a hamburger toggle.
+- Brand header with bot icon and name added to the top of the sidebar.
+- Bot version number now stays visible in the sidebar even when it is collapsed.
+- Auto-Scale button moved below the Start Fishing button.
+- Reset Positions button added to zero out all coordinates at once.
+- Coordinate display now shows on a single line.
+- Dark mode and light mode now apply correctly to all cards and sidebar elements.
+- Section names shown in the border line of each card.
+---
+
 ## Version 2.2.3
 
 - **Auto-Scale now resizes the game window for you.** No need to manually set the game to 1280x720 first. The bot switches the game to windowed mode, adds the title bar, and resizes it automatically when you click Auto-Scale.

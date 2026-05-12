@@ -13,7 +13,7 @@
     <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-    <OutputPath>bin\Release\v2.2.3\</OutputPath>
+    <OutputPath>bin\Release\v2.5\</OutputPath>
     <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
   <PropertyGroup>

@@ -64,11 +64,47 @@
       </Setter.Value>
     </Setter>
   </Style>
+  <Style x:Key="btnSquareDark" TargetType="{x:Type Button}">
+    <Style.Resources>
+      <ResourceDictionary>
+        <Style x:Key="{x:Type Border}" TargetType="{x:Type Border}">
+          <Setter Property="Border.CornerRadius" Value="5" />
+        </Style>
+      </ResourceDictionary>
+    </Style.Resources>
+    <Setter Property="Foreground" Value="#FFFFFFFF" />
+    <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Background">
+      <Setter.Value>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Color="#2563a8" Offset="0" />
+          <GradientStop Color="#163d6e" Offset="1" />
+        </LinearGradientBrush>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type Button}">
+          <Border Name="Border" Background="{TemplateBinding Control.Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="UIElement.IsMouseOver" Value="True">
+              <Setter TargetName="Border" Property="Border.Background" Value="#3480cc" />
+            </Trigger>
+            <Trigger Property="ButtonBase.IsPressed" Value="True">
+              <Setter TargetName="Border" Property="Border.Background" Value="#0e2d52" />
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
   <BorderGapMaskConverter x:Key="BorderGapMaskConverter" />
   <Style x:Key="{x:Type GroupBox}" TargetType="{x:Type GroupBox}">
     <Setter Property="BorderBrush" Value="#FF808080" />
     <Setter Property="Foreground" Value="#FFFFFFFF" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderThickness" Value="4" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type GroupBox}">
@@ -112,11 +148,12 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type Button}">
           <Border Name="Border" Background="{TemplateBinding Control.Background}" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="UIElement.IsMouseOver" Value="True">
@@ -135,11 +172,12 @@
     <Setter Property="Cursor" Value="Hand" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type Button}">
           <Border Name="Border" Background="{TemplateBinding Control.Background}" CornerRadius="6" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
-            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" />
           </Border>
           <ControlTemplate.Triggers>
             <Trigger Property="UIElement.IsMouseOver" Value="True">
