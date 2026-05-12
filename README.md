@@ -1,9 +1,9 @@
 <p align="center">
-  <img width="563" height="628" alt="FishingBotPNG" src="https://github.com/user-attachments/assets/fff8ef90-6910-4714-9beb-4147d0e55e89" />
+  <img width="883" height="795" alt="image" src="https://github.com/user-attachments/assets/15e0f9e4-0231-4073-baf4-66959a37e6f0" />
 </p>
 
 
-# NTE-Fisherman `v2.5`
+# NTE-Fisherman
 A fishing bot using OpenCVSharp and SharpDX, originally a Tower of Fantasy bot made by mdnpascual and repurposed for Neverness to Everness.
 
 **NTE Fisherman** is an automated fishing bot for NTE that handles casting, reeling, and recasting so you don't have to watch the screen and click manually. It requires some setup, but after the first time it is done you rarely need to touch it again.
