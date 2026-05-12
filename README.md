@@ -42,6 +42,8 @@ Click the picker button, then click the exact pixel on your screen. The bot stor
 5. **Dismiss.** Clicks to dismiss the catch dialog, retrying up to 8 times if the bar stays visible.
 6. **Recast.** Casts again and repeats.
 
+- There's an optional bait counter, which stops the bot after using all the bait available. (Enter # of Bait and Bot Ends after # of Bait)
+
 ---
 
 ## Recommended: Play with Full Focus
