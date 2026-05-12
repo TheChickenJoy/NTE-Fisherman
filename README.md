@@ -8,7 +8,7 @@ A fishing bot using OpenCVSharp and SharpDX, originally a Tower of Fantasy bot m
 
 **NTE Fisherman** is an automated fishing bot for NTE that handles casting, reeling, and recasting so you don't have to watch the screen and click manually. It requires some setup, but after the first working one it doesn't really require another setup.
 
-> Follow the video/picture step by step, you won't have issues. [Setup Guide](https://youtu.be/pxeqgBSCB0U)
+> Follow the video/picture step by step, you won't have issues. [Setup Guide](https://www.youtube.com/watch?v=BlUfjPJfAh4)
 
 ---
 
